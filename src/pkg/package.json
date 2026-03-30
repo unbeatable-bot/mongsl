@@ -1,0 +1,15 @@
+{
+  "name": "wasm-image-cropper",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "wasm_image_cropper_bg.wasm",
+    "wasm_image_cropper.js",
+    "wasm_image_cropper.d.ts"
+  ],
+  "main": "wasm_image_cropper.js",
+  "types": "wasm_image_cropper.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
