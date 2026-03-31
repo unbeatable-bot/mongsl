@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { ReactCrop, type Crop, centerCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { saveAs } from 'file-saver';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import InfoPage from './pages/InfoPage';
+import PrivacyPolicyModal from './pages/PrivacyPolicyModal';
 
 interface ImageFile {
   id: string;
@@ -24,6 +25,9 @@ function MainAppContent() {
   const [isUploading, setIsUploading] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const [showThumbnails, setShowThumbnails] = useState(true);
+  // 팝업 띄우기 상태 추가
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false); // 개인정보 팝업 상태 추가
 
   const workerRef = useRef<Worker | null>(null);
   
@@ -205,10 +209,31 @@ function MainAppContent() {
           >
             {isProcessing && processingType === 'zip' ? '생성 중...' : '이미지(ZIP) 다운로드'}
           </button>
-
-          <Link to="/info" className="info-link">사용 안내</Link>
         </div>
-      </div>
+      </div> {/* <-- 여기서 main-content div가 끝납니다. */}
+
+      {/* ================= 새로 추가되는 Footer 영역 ================= */}
+      <footer className="site-footer">
+        <div className="footer-content">
+          <div className="footer-brand">
+            <strong>MONGSL</strong>
+            <span>Image Crop & Compile Web Service</span>
+          </div>
+          <div className="footer-links">
+            {/* 버튼이 아닌 푸터 링크 스타일로 추가합니다. */}
+            <a href="#" onClick={(e) => { e.preventDefault(); setIsInfoOpen(true); }}>사용 안내</a>
+            <a href="mailto:contact@example.com">Contact Us</a>
+            <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+            {/* 필요하다면 아래 주석을 풀고 개인정보처리방침 등 추가 가능 */}
+            <a href="#" onClick={(e) => { e.preventDefault(); setIsPrivacyOpen(true); }}>Privacy Policy</a>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          &copy; {new Date().getFullYear()} MONGSL. All rights reserved.
+        </div>
+      </footer>
+      {/* ========================================================= */}
+
       {isProcessing && (
         <div className="processing-overlay">
           <div className="spinner"></div><p>{processingType === 'pdf' ? 'PDF를' : 'ZIP 파일을'} 생성 중입니다... 잠시만 기다려 주세요.</p>
@@ -219,6 +244,14 @@ function MainAppContent() {
           <div className="spinner"></div>
           <p>이미지 미리보기를 준비 중입니다...</p>
         </div>
+      )}
+      {/* 추가: isInfoOpen 상태가 true일 때만 InfoPage 팝업 렌더링 */}
+      {isInfoOpen && (
+        <InfoPage onClose={() => setIsInfoOpen(false)} />
+      )}
+      {/* 새로 추가된 개인정보처리방침 팝업 */}
+      {isPrivacyOpen && (
+        <PrivacyPolicyModal onClose={() => setIsPrivacyOpen(false)} />
       )}
     </div>
   );
@@ -238,7 +271,6 @@ function App() {
   return (
       <Routes>
         <Route path="/" element={<MainAppContent />} /> 
-        <Route path="/info" element={<InfoPage />} /> 
       </Routes>
   );
 }
