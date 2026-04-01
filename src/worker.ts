@@ -3,7 +3,8 @@ import JSZip from 'jszip';
 
 self.onmessage = async (e) => {
   try {
-    const { format, images, completedCrop, selectedImage, viewPort } = e.data;
+    // ✨ 변경점: quality 파라미터 추가 (기본값 0.95)
+    const { format, images, completedCrop, selectedImage, viewPort, quality = 0.95 } = e.data;
 
     // 크롭 스케일 및 오프셋 계산 (기존과 동일)
     const scaleX = selectedImage.originalWidth / viewPort.width;
@@ -11,7 +12,6 @@ self.onmessage = async (e) => {
     const offsetX = (viewPort.containerWidth - viewPort.width) / 2;
     const offsetY = (viewPort.containerHeight - viewPort.height) / 2;
 
-    // 공통: 크롭 좌표 계산 함수 (기존 Rust에서 처리하던 경계값 체크 포함)
     const getActualCropCoordinates = (imageFile: any) => {
       const translatedX = completedCrop.x - offsetX;
       const translatedY = completedCrop.y - offsetY;
@@ -29,28 +29,24 @@ self.onmessage = async (e) => {
       return { x: actualCropX, y: actualCropY, w: actualCropWidth, h: actualCropHeight };
     };
 
-    // ✨ 핵심: OffscreenCanvas를 활용한 네이티브 이미지 크롭 함수
-    const cropImageWithCanvas = async (imageBuffer: ArrayBuffer, coords: any) => {
-      // 1. ArrayBuffer를 브라우저 네이티브 ImageBitmap으로 디코딩 (GPU 가속 활용 가능)
+    // ✨ 변경점: imgQuality 파라미터를 받아 압축률에 적용
+    const cropImageWithCanvas = async (imageBuffer: ArrayBuffer, coords: any, imgQuality: number) => {
       const blob = new Blob([imageBuffer]);
       const imageBitmap = await createImageBitmap(blob);
       
-      // 2. 백그라운드 스레드용 캔버스 생성 (크롭할 크기만큼)
       const canvas = new OffscreenCanvas(coords.w, coords.h);
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Canvas 2D context is not supported');
 
-      // 3. 캔버스에 잘라낼 영역만 그리기
       ctx.drawImage(
           imageBitmap,
-          coords.x, coords.y, coords.w, coords.h, // Source (원본 이미지에서 자를 영역)
-          0, 0, coords.w, coords.h                // Destination (캔버스에 그려질 위치와 크기)
+          coords.x, coords.y, coords.w, coords.h, 
+          0, 0, coords.w, coords.h                
       );
 
-      // 4. 그려진 캔버스를 고품질 JPEG Blob으로 변환
-      const croppedBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.95 });
+      // ✨ 변경점: 하드코딩된 0.95 대신 전달받은 imgQuality 사용
+      const croppedBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: imgQuality });
       
-      // 5. Blob을 다시 Uint8Array로 변환하여 반환
       const arrayBuffer = await croppedBlob.arrayBuffer();
       return new Uint8Array(arrayBuffer);
     };
@@ -66,8 +62,8 @@ self.onmessage = async (e) => {
         
         if (!coords) continue;
 
-        // Wasm 대신 새 함수 호출
-        const croppedBytes = await cropImageWithCanvas(imageFile.buffer, coords);
+        // ✨ 변경점: quality 파라미터 전달
+        const croppedBytes = await cropImageWithCanvas(imageFile.buffer, coords, quality);
         
         if (croppedBytes && croppedBytes.length > 0) {
           const fileName = imageFile.name || `cropped_image_${i + 1}.jpg`;
@@ -94,8 +90,8 @@ self.onmessage = async (e) => {
         
         if (!coords) continue;
 
-        // Wasm 대신 새 함수 호출
-        const croppedBytes = await cropImageWithCanvas(imageFile.buffer, coords);
+        // ✨ 변경점: quality 파라미터 전달
+        const croppedBytes = await cropImageWithCanvas(imageFile.buffer, coords, quality);
         
         if (croppedBytes && croppedBytes.length > 0) {
           const jpgImage = await pdfDoc.embedJpg(croppedBytes);
