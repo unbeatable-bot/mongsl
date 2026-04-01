@@ -168,7 +168,17 @@ h1 { text-align: center; color: #ffffff; margin-top: 0; flex-shrink: 0; }
 
 /* ================= 모바일 환경 대응 ================= */
 @media (max-width: 768px) {
-  body, .container { padding: 10px; } 
+  /* React의 inline style(overflow: hidden)을 무시하고 모바일에서 전체 스크롤 허용 */
+  body {
+    overflow-y: auto !important; 
+  }
+
+  .container { 
+    padding: 10px; 
+    height: auto; /* 고정 높이 해제 */
+    min-height: 100dvh; /* 모바일 브라우저 주소창 높이를 제외한 실제 뷰포트 높이 적용 */
+  } 
+  
   h1 { font-size: 1.5em; }
   
   .custom-file-upload, .reset-crop-button, .pdf-download-button, .zip-download-button, .info-link { 
@@ -178,18 +188,19 @@ h1 { text-align: center; color: #ffffff; margin-top: 0; flex-shrink: 0; }
   .main-content { 
     flex-direction: column; /* 세로 배치 */
     gap: 10px; 
-    overflow-y: auto; /* 전체 스크롤 허용 */
+    overflow: visible; /* 내부 스크롤 대신 전체 브라우저 스크롤을 사용하도록 변경 */
+    height: auto;
   }
 
   /* 1. 크롭 영역 (최상단) */
   .cropper-container { 
     order: 1; 
-    flex: 1;
-    min-height: 250px; 
+    width: 100%;
+    min-height: 350px; /* 모바일에서 크롭하기 편하도록 최소 높이 보장 */
     margin-left: 0;
   }
 
-  /* 2. 썸네일 영역 (중간 - Horizontal Scroll) */
+  /* 2. 썸네일 영역 (중간 - 가로 스크롤) */
   .thumbnail-wrapper { 
     order: 2; 
     width: 100%; 
@@ -202,7 +213,7 @@ h1 { text-align: center; color: #ffffff; margin-top: 0; flex-shrink: 0; }
   }
   .thumbnail-list { 
     flex-direction: row; /* 가로 배치 */
-    height: 90px; 
+    height: 100px; /* 터치하기 편하게 높이 약간 증가 */
     padding: 10px; 
     overflow-x: auto; 
     overflow-y: hidden;
@@ -222,6 +233,15 @@ h1 { text-align: center; color: #ffffff; margin-top: 0; flex-shrink: 0; }
     margin-left: 0; 
     width: 100%;
   }
+
+  /* Footer 여백 조정 */
+  .site-footer { 
+    margin-top: 20px;
+    padding-bottom: 20px; /* 모바일 하단 제스처 바 공간 확보 */
+  }
+  .footer-content { flex-direction: column; align-items: center; text-align: center; }
+  .footer-brand span { display: block; margin-top: 5px; }
+  .footer-links { margin-top: 10px; flex-wrap: wrap; justify-content: center; }
 }
 
 /* ================= Footer ================= */
