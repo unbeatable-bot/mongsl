@@ -239,13 +239,13 @@ h1 { text-align: center; color: #ffffff; margin-top: 0; flex-shrink: 0; }
 
 /* ================= 모바일 환경 대응 ================= */
 @media (max-width: 768px) {
-  body { overflow-y: auto !important; }
   
-  .container { 
-    padding: 10px; 
-    height: auto; 
-    min-height: 100dvh; 
-  } 
+  /* ✨ 1. 화면 겹침(오버랩) 해결: body와 container의 고정 높이를 풀어 자연스럽게 스크롤되도록 함 */
+  body, #root, .container {
+    height: auto !important;
+    min-height: 100dvh;
+    overflow-y: auto !important;
+  }
   
   h1 { font-size: 1.5em; }
   
@@ -275,6 +275,30 @@ h1 { text-align: center; color: #ffffff; margin-top: 0; flex-shrink: 0; }
   .aspect-buttons { overflow-x: auto; padding-bottom: 5px; }
   .preview-modal-content { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
   .quality-selector-wrapper { width: 100%; flex: 1 1 100%; }
+
+  /* ================= Footer 모바일 최적화 ================= */
+  .site-footer { 
+    margin-top: 20px;
+    /* 핵심: 위에서 밀려날 때 푸터 영역이 찌그러지지 않도록 방어 */
+    flex-shrink: 0; 
+  }
+  .footer-content { flex-direction: column; align-items: center; text-align: center; }
+  .footer-brand span { display: block; margin-top: 5px; }
+  
+  /* 링크 수직 중앙 정렬 완벽 해결 */
+  .footer-links { 
+    margin-top: 10px; 
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center; 
+    align-items: center; /* 텍스트 높낮이가 달라도 강제로 중앙에 맞춤 */
+    gap: 15px; 
+  }
+  .footer-links a {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1; /* 폰트 고유의 위아래 여백을 제거하여 정확히 일직선 정렬 */
+  }
 }
 
 /* ================= Footer ================= */
@@ -289,10 +313,3 @@ h1 { text-align: center; color: #ffffff; margin-top: 0; flex-shrink: 0; }
 .footer-links a { color: #888; text-decoration: none; transition: color 0.2s ease; }
 .footer-links a:hover { color: #fff; text-decoration: underline; }
 .footer-bottom { text-align: center; font-size: 12px; color: #555; margin-top: 5px; }
-
-@media (max-width: 768px) {
-  .site-footer { margin-top: 15px; }
-  .footer-content { flex-direction: column; align-items: center; text-align: center; }
-  .footer-brand span { display: block; margin-top: 5px; }
-  .footer-links { margin-top: 10px; flex-wrap: wrap; justify-content: center; }
-}
