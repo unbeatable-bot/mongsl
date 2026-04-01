@@ -403,6 +403,13 @@ function MainAppContent() {
         </div> 
       )}
       
+      {isUploading && (
+        <div className="processing-overlay">
+          <div className="spinner"></div>
+          <p>이미지 미리보기를 준비 중입니다...</p>
+        </div>
+      )}
+
       {isPreviewOpen && (
         <div className="preview-modal-overlay">
           <div className="preview-modal">
