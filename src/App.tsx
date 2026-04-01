@@ -21,7 +21,6 @@ function MainAppContent() {
   const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingType, setProcessingType] = useState<'pdf' | 'zip' | null>(null);
-  const [isWasmReady, setIsWasmReady] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const [showThumbnails, setShowThumbnails] = useState(true);
@@ -59,12 +58,31 @@ function MainAppContent() {
       setProcessingType(null);
     };
 
-    setIsWasmReady(true);
-
     return () => {
       workerRef.current?.terminate();
     };
   }, []);
+
+  // [추가] 크롭 영역 초기화 함수
+  const handleResetCrop = () => {
+    if (!imgRef.current) return;
+    
+    const { width: imgWidth, height: imgHeight } = imgRef.current;
+    const container = imgRef.current.parentElement?.parentElement;
+    if (!container) return;
+    
+    const { clientWidth: containerWidth, clientHeight: containerHeight } = container;
+
+    // 초기 로드 시와 동일한 로직으로 중앙 크롭 영역 계산
+    const initialCrop = centerCrop(
+      { unit: 'px', width: imgWidth, height: imgHeight },
+      containerWidth,
+      containerHeight
+    );
+    
+    setCrop(initialCrop);
+    setCompletedCrop(initialCrop);
+  };
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -118,7 +136,7 @@ function MainAppContent() {
   };
 
   const handleProcessImages = async (format: 'pdf' | 'zip') => {
-    if (!isWasmReady || !completedCrop || !imgRef.current || !selectedImage?.originalWidth) {
+    if (!completedCrop || !imgRef.current || !selectedImage?.originalWidth) {
       alert("이미지를 업로드하고 크롭 영역을 선택해 주세요.");
       return;
     }
@@ -178,7 +196,7 @@ function MainAppContent() {
         
         <button className={`toggle-thumbnails-btn ${showThumbnails ? 'shown' : 'hidden'}`} onClick={() => setShowThumbnails(!showThumbnails)} title={showThumbnails ? "미리보기 숨기기" : "미리보기 보이기"}>{showThumbnails ? '◀' : '▶'}</button>
 
-        <div className="cropper-container">
+<div className="cropper-container">
           {selectedImage && (
             <ReactCrop
               crop={crop}
@@ -190,14 +208,24 @@ function MainAppContent() {
             </ReactCrop>
           )}
         </div>
+        
         <div className="actions-bar side">
           <label htmlFor="file-upload" className="custom-file-upload">이미지 업로드 ({images.length}장)</label>
           <input id="file-upload" type="file" multiple accept="image/*" onChange={onFileChange} />
           
+          {/* [추가] 크롭 초기화 버튼 - 업로드된 이미지가 있을 때만 노출 */}
+          <button 
+            onClick={handleResetCrop} 
+            className="reset-crop-button"
+            disabled={!selectedImage || isProcessing}
+          >
+            크롭 영역 초기화
+          </button>
+          
           <button 
             onClick={() => handleProcessImages('pdf')} 
             className="pdf-download-button" 
-            disabled={!isWasmReady || images.length === 0 || !completedCrop || isProcessing}
+            disabled={images.length === 0 || !completedCrop || isProcessing}
           >
             {isProcessing && processingType === 'pdf' ? '생성 중...' : 'PDF 다운로드'}
           </button>
@@ -205,14 +233,13 @@ function MainAppContent() {
           <button 
             onClick={() => handleProcessImages('zip')} 
             className="zip-download-button"
-            disabled={!isWasmReady || images.length === 0 || !completedCrop || isProcessing}
+            disabled={images.length === 0 || !completedCrop || isProcessing}
           >
             {isProcessing && processingType === 'zip' ? '생성 중...' : '이미지(ZIP) 다운로드'}
           </button>
         </div>
-      </div> {/* <-- 여기서 main-content div가 끝납니다. */}
+      </div>
 
-      {/* ================= 새로 추가되는 Footer 영역 ================= */}
       <footer className="site-footer">
         <div className="footer-content">
           <div className="footer-brand">
@@ -220,12 +247,10 @@ function MainAppContent() {
             <span>Image Crop & Compile Web Service</span>
           </div>
           <div className="footer-links">
-            {/* 버튼이 아닌 푸터 링크 스타일로 추가합니다. */}
             <a href="#" onClick={(e) => { e.preventDefault(); setIsInfoOpen(true); }}>사용 안내</a>
             <a href="mailto:contact@example.com">Contact Us</a>
             <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
-            {/* 필요하다면 아래 주석을 풀고 개인정보처리방침 등 추가 가능 */}
-            <a href="#" onClick={(e) => { e.preventDefault(); setIsPrivacyOpen(true); }}>Privacy Policy</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); setIsPrivacyOpen(true); }}>개인정보처리방침</a>
           </div>
         </div>
         <div className="footer-bottom">
