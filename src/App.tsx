@@ -23,10 +23,10 @@ function MainAppContent() {
   const [processingType, setProcessingType] = useState<'pdf' | 'zip' | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
-  const [showThumbnails, setShowThumbnails] = useState(true);
-  // 팝업 띄우기 상태 추가
+  
+  // 기존 showThumbnails 상태 제거
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false); // 개인정보 팝업 상태 추가
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   const workerRef = useRef<Worker | null>(null);
   
@@ -39,18 +39,10 @@ function MainAppContent() {
       const { status, data, message, format } = e.data;
       if (status === 'success') {
         const mimeType = format === 'pdf' ? 'application/pdf' : 'application/zip';
-        
-        // 현재 시간(밀리초) 가져오기
         const timestamp = Date.now();
-        // format 변수가 'pdf' 또는 'zip'을 가지고 있으므로 이를 활용하여 동적 파일명 생성
         const defaultFileName = `mongsl-${format}-${timestamp}.${format}`;
-
-        // TypeScript 타입 에러 해결: data를 BlobPart로 명시적 형변환
         const blob = new Blob([data as BlobPart], { type: mimeType });
-        
-        // 브라우저에서 직접 다운로드 실행
         saveAs(blob, defaultFileName);
-
       } else {
         alert(`파일 생성 실패: ${message}`);
       }
@@ -63,23 +55,18 @@ function MainAppContent() {
     };
   }, []);
 
-  // [추가] 크롭 영역 초기화 함수
   const handleResetCrop = () => {
     if (!imgRef.current) return;
-    
     const { width: imgWidth, height: imgHeight } = imgRef.current;
     const container = imgRef.current.parentElement?.parentElement;
     if (!container) return;
-    
     const { clientWidth: containerWidth, clientHeight: containerHeight } = container;
 
-    // 초기 로드 시와 동일한 로직으로 중앙 크롭 영역 계산
     const initialCrop = centerCrop(
       { unit: 'px', width: imgWidth, height: imgHeight },
       containerWidth,
       containerHeight
     );
-    
     setCrop(initialCrop);
     setCompletedCrop(initialCrop);
   };
@@ -140,7 +127,6 @@ function MainAppContent() {
       alert("이미지를 업로드하고 크롭 영역을 선택해 주세요.");
       return;
     }
-
     setIsProcessing(true);
     setProcessingType(format);
 
@@ -175,7 +161,6 @@ function MainAppContent() {
         containerHeight: container.clientHeight,
       },
     };
-
     workerRef.current?.postMessage(workerData);
   };
 
@@ -188,15 +173,23 @@ function MainAppContent() {
       </div>
       
       <div className="main-content">
-        <div className={`thumbnail-wrapper ${showThumbnails ? '' : 'hidden'}`}>
+        {/* 썸네일 영역 (모바일: 중간 배치) */}
+        <div className="thumbnail-wrapper">
           <div className="thumbnail-list">
-            {images.map(image => (<img key={image.id} src={image.previewUrl} alt="thumbnail" className={selectedImage?.id === image.id ? 'active' : ''} onClick={() => setSelectedImage(image)} />))}
+            {images.map(image => (
+              <img 
+                key={image.id} 
+                src={image.previewUrl} 
+                alt="thumbnail" 
+                className={selectedImage?.id === image.id ? 'active' : ''} 
+                onClick={() => setSelectedImage(image)} 
+              />
+            ))}
           </div>
         </div>
         
-        <button className={`toggle-thumbnails-btn ${showThumbnails ? 'shown' : 'hidden'}`} onClick={() => setShowThumbnails(!showThumbnails)} title={showThumbnails ? "미리보기 숨기기" : "미리보기 보이기"}>{showThumbnails ? '◀' : '▶'}</button>
-
-<div className="cropper-container">
+        {/* 크롭 영역 (모바일: 최상단 배치) */}
+        <div className="cropper-container">
           {selectedImage && (
             <ReactCrop
               crop={crop}
@@ -209,11 +202,11 @@ function MainAppContent() {
           )}
         </div>
         
+        {/* 액션 버튼 (모바일: 최하단 배치) */}
         <div className="actions-bar side">
           <label htmlFor="file-upload" className="custom-file-upload">이미지 업로드 ({images.length}장)</label>
           <input id="file-upload" type="file" multiple accept="image/*" onChange={onFileChange} />
           
-          {/* [추가] 크롭 초기화 버튼 - 업로드된 이미지가 있을 때만 노출 */}
           <button 
             onClick={handleResetCrop} 
             className="reset-crop-button"
@@ -257,12 +250,12 @@ function MainAppContent() {
           &copy; {new Date().getFullYear()} MONGSL. All rights reserved.
         </div>
       </footer>
-      {/* ========================================================= */}
 
       {isProcessing && (
         <div className="processing-overlay">
           <div className="spinner"></div><p>{processingType === 'pdf' ? 'PDF를' : 'ZIP 파일을'} 생성 중입니다... 잠시만 기다려 주세요.</p>
-        </div> )}
+        </div> 
+      )}
       
       {isUploading && (
         <div className="processing-overlay">
@@ -270,11 +263,9 @@ function MainAppContent() {
           <p>이미지 미리보기를 준비 중입니다...</p>
         </div>
       )}
-      {/* 추가: isInfoOpen 상태가 true일 때만 InfoPage 팝업 렌더링 */}
       {isInfoOpen && (
         <InfoPage onClose={() => setIsInfoOpen(false)} />
       )}
-      {/* 새로 추가된 개인정보처리방침 팝업 */}
       {isPrivacyOpen && (
         <PrivacyPolicyModal onClose={() => setIsPrivacyOpen(false)} />
       )}
