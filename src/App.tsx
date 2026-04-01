@@ -108,6 +108,63 @@ function MainAppContent() {
     };
   }, []);
 
+// ✨ 핵심 개선: 이동(Drag)과 크기 조절(Resize)을 구분하여 완벽하게 화면 이탈 방지
+  const handleCropChange = (c: Crop) => {
+    if (!imgRef.current) {
+      setCrop(c);
+      return;
+    }
+    
+    const { width: imgWidth, height: imgHeight } = imgRef.current;
+    const container = imgRef.current.parentElement?.parentElement;
+    const containerWidth = container?.clientWidth || imgWidth;
+    const containerHeight = container?.clientHeight || imgHeight;
+
+    // 이미지가 떠있는 여백 위치
+    const offsetX = (containerWidth - imgWidth) / 2;
+    const offsetY = (containerHeight - imgHeight) / 2;
+
+    let { x, y, width, height } = c;
+
+    // 이전 상태의 크기와 비교하여 '단순 이동'인지 '크기 조절'인지 판단 (소수점 오차 방지)
+    const isMoving = crop && Math.abs(crop.width - width) < 0.1 && Math.abs(crop.height - height) < 0.1;
+
+    if (isMoving) {
+      // 1. 단순 이동(Drag) 중일 때: 상자 크기는 유지하고 좌/우/상/하 좌표가 벽을 못 넘게 막음
+      if (x < offsetX) x = offsetX; // 좌측 벽
+      if (y < offsetY) y = offsetY; // 상단 벽
+      if (x + width > offsetX + imgWidth) x = offsetX + imgWidth - width; // 우측 벽
+      if (y + height > offsetY + imgHeight) y = offsetY + imgHeight - height; // 하단 벽
+    } else {
+      // 2. 크기 조절(Resize) 중일 때: 박스가 밖으로 나가는 만큼 너비와 높이를 깎아냄
+      if (x < offsetX) {
+        width -= (offsetX - x);
+        x = offsetX;
+      }
+      if (y < offsetY) {
+        height -= (offsetY - y);
+        y = offsetY;
+      }
+      if (x + width > offsetX + imgWidth) {
+        width = offsetX + imgWidth - x;
+      }
+      if (y + height > offsetY + imgHeight) {
+        height = offsetY + imgHeight - y;
+      }
+      
+      // 비율(Aspect Ratio) 프리셋이 적용된 상태라면, 찌그러지지 않게 다시 비율 강제 맞춤
+      if (aspect) {
+        if (width / aspect > height) {
+          width = height * aspect;
+        } else {
+          height = width / aspect;
+        }
+      }
+    }
+
+    setCrop({ ...c, x, y, width, height });
+  };
+
   // ✨ 크롭 영역 초기화 시
   const handleResetCrop = () => {
     if (!imgRef.current) return;
@@ -329,7 +386,7 @@ function MainAppContent() {
           {selectedImage && (
             <ReactCrop
               crop={crop}
-              onChange={c => setCrop(c)}
+              onChange={handleCropChange} // ✨ onChange에 JS 강제 제한 로직 추가
               onComplete={c => setCompletedCrop(c)}
               aspect={aspect}
               ruleOfThirds
