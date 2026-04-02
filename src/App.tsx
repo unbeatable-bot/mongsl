@@ -5,6 +5,23 @@ import { saveAs } from 'file-saver';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import InfoPage from './pages/InfoPage';
 import PrivacyPolicyModal from './pages/PrivacyPolicyModal';
+// 기존 import 들 아래에 추가
+import {
+  DndContext,
+  closestCenter,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  horizontalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface ImageFile {
   id: string;
@@ -12,6 +29,44 @@ interface ImageFile {
   previewUrl: string;
   originalWidth?: number;
   originalHeight?: number;
+}
+
+// MainAppContent 함수 바깥에 선언해 주세요.
+interface SortableThumbnailProps {
+  image: ImageFile;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+function SortableThumbnail({ image, isActive, onClick }: SortableThumbnailProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: image.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1, // 드래그 중인 요소를 위로 띄움
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  return (
+    <img
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      src={image.previewUrl}
+      alt="thumbnail"
+      className={`thumbnail-img ${isActive ? 'active' : ''} ${isDragging ? 'is-dragging' : ''}`}
+      onClick={onClick}
+    />
+  );
 }
 
 const ASPECT_RATIOS = [
@@ -112,6 +167,37 @@ function MainAppContent() {
       workerRef.current?.terminate();
     };
   }, []);
+
+  // ✨ 통합된 센서 설정 (PC와 모바일을 완벽하게 구분하면서 통합 제어)
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5, // PC: 마우스로 5px 이상 움직여야 드래그로 인식 (클릭과 구분)
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // 모바일: 250ms 동안 길게 눌러야 드래그 모드 진입 (스크롤과 구분!)
+        tolerance: 5, // 누르는 동안 손가락이 5px 이상 미끄러지면 취소
+      },
+    })
+  );
+
+  // ✨ 단 하나의 드롭 이벤트 핸들러만 필요합니다
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    // 다른 위치에 드롭되었을 때만 배열 순서 변경
+    if (over && active.id !== over.id) {
+      setImages((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        
+        // arrayMove가 기존 배열의 위치를 안전하게 스왑해 줍니다.
+        return arrayMove(items, oldIndex, newIndex); 
+      });
+    }
+  };
 
 // ✨ 핵심 개선: 이동(Drag)과 크기 조절(Resize)을 구분하여 완벽하게 화면 이탈 방지
   const handleCropChange = (c: Crop) => {
@@ -408,18 +494,28 @@ function MainAppContent() {
       )}
 
       <div className="main-content">
-        <div className="thumbnail-wrapper">
-          <div className="thumbnail-list">
-            {images.map(image => (
-              <img 
-                key={image.id} 
-                src={image.previewUrl} 
-                alt="thumbnail" 
-                className={selectedImage?.id === image.id ? 'active' : ''} 
-                onClick={() => setSelectedImage(image)} 
-              />
-            ))}
-          </div>
+<div className="thumbnail-wrapper">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="thumbnail-list">
+              <SortableContext
+                items={images.map(img => img.id)}
+                strategy={horizontalListSortingStrategy}
+              >
+                {images.map(image => (
+                  <SortableThumbnail
+                    key={image.id}
+                    image={image}
+                    isActive={selectedImage?.id === image.id}
+                    onClick={() => setSelectedImage(image)}
+                  />
+                ))}
+              </SortableContext>
+            </div>
+          </DndContext>
         </div>
 
         <div className="cropper-container">
