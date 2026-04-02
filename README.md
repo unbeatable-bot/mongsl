@@ -47,21 +47,21 @@
 <details>
 <summary><b>1. 화면을 벗어나지 않는 안전한 크롭 제어</b></summary>
 <div markdown="1">
-  <img src="https://via.placeholder.com/600x300?text=Insert+Crop+GIF+Here" alt="Crop Control">
+  <!-- <img src="https://via.placeholder.com/600x300?text=Insert+Crop+GIF+Here" alt="Crop Control"> -->
 </div>
 </details>
 
 <details>
 <summary><b>2. 자연스러운 Drag & Drop 순서 변경 (모바일/PC 지원)</b></summary>
 <div markdown="1">
-  <img src="https://via.placeholder.com/600x300?text=Insert+Drag+Drop+GIF+Here" alt="Drag and Drop">
+  <!-- <img src="https://via.placeholder.com/600x300?text=Insert+Drag+Drop+GIF+Here" alt="Drag and Drop"> -->
 </div>
 </details>
 
 <details>
 <summary><b>3. 실시간 이미지 필터 및 미리보기</b></summary>
 <div markdown="1">
-  <img src="https://via.placeholder.com/600x300?text=Insert+Filter+Preview+Here" alt="Filter Preview">
+  <!-- <img src="https://via.placeholder.com/600x300?text=Insert+Filter+Preview+Here" alt="Filter Preview"> -->
 </div>
 </details>
 
