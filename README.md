@@ -39,6 +39,38 @@
 **[문제]** 수십 장의 이미지를 순회하며 Canvas에 그리고 PDF 인코딩을 수행할 때, 메인 스레드가 블로킹되어 브라우저가 멈추는(UI Freezing) 현상 발생.
 **[해결]** * 무거운 이미지 처리(Pixel Manipulation) 로직과 `pdf-lib`, `jszip` 연산을 전담하는 `worker.ts`를 분리했습니다.
 * 워커 내부에서 `OffscreenCanvas`를 활용하여 비동기적으로 필터(`ctx.filter`)를 굽고 이미지를 잘라내도록 처리했습니다. 결과적으로 파일이 컴파일되는 동안에도 로딩 스피너 애니메이션이 멈추지 않는 **60fps의 부드러운 사용자 경험(UX)**을 달성했습니다.
+sequenceDiagram
+    autonumber
+    participant Main as Main Thread (React UI)
+    participant Worker as Web Worker (worker.ts)
+    participant Canvas as OffscreenCanvas
+    participant Libs as pdf-lib / jszip
+
+    Note over Main: 사용자 이미지 업로드 & 크롭/필터 설정 완료
+    Main->>Main: 개별 이미지별 설정값(Scale, Crop, Filter) 취합
+    
+    Note over Main: "다운로드" 버튼 클릭
+    Main->>Worker: postMessage({ type: 'PROCESS', images, settings })
+    
+    Note right of Main: UI 스레드 Free! 로딩 스피너 작동 중
+    
+    Worker->>Worker: message 이벤트 수신 및 Blob 데이터 준비
+    
+    loop 개별 이미지 처리
+        Worker->>Canvas: OffscreenCanvas 생성 및 원본 Blob 그리기
+        Canvas->>Canvas: (1) 크롭 좌표 기반 영역 추출
+        Canvas->>Canvas: (2) ctx.filter 적용 (픽셀 굽기)
+        Canvas->>Worker: 처리된 이미지 데이터 추출 (convertToBlob)
+    end
+    
+    Worker->>Libs: 처리된 이미지 Blob들을 전달
+    Libs->>Libs: PDF/ZIP 컴파일 수행 (가장 무거운 연산)
+    Libs->>Worker: 최종 생성된 결과물 Blob 반환
+    
+    Worker->>Main: postMessage({ type: 'COMPLETE', finalBlob, filename })
+    
+    Note over Main: 결과 수신 및 로딩 스피너 종료
+    Main->>Main: URL.createObjectURL() 기반 파일 다운로드 트리거
 
 ---
 
