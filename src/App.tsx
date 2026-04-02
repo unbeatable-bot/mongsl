@@ -81,6 +81,11 @@ function MainAppContent() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
+  // ✨ 추가: 이미지 보정 필터 상태 (기본값: 밝기 100%, 대비 100%, 흑백 0%)
+  const [brightness, setBrightness] = useState<number>(100);
+  const [contrast, setContrast] = useState<number>(100);
+  const [grayscale, setGrayscale] = useState<number>(0);
+
   const workerRef = useRef<Worker | null>(null);
   
   useEffect(() => {
@@ -268,7 +273,8 @@ function MainAppContent() {
       format,
       images: imagePayloads,
       completedCrop,
-      quality, 
+      quality,
+      filters: { brightness, contrast, grayscale }, // ✨ 추가: 필터 값 워커로 전달
       selectedImage: {
         originalWidth: selectedImage.originalWidth,
         originalHeight: selectedImage.originalHeight,
@@ -323,8 +329,12 @@ function MainAppContent() {
         const cropWidth = imageElement.width * scaleX;
         const cropHeight = imageElement.height * scaleY;
 
+        // 1. 반드시 캔버스 크기를 먼저 설정합니다. (이때 ctx가 초기화됨)
         canvas.width = cropWidth;
         canvas.height = cropHeight;
+
+        // ✨ 2. 크기 설정 "이후"이자 그리기 "직전"에 필터를 적용해야 정상 동작합니다!
+        ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) grayscale(${grayscale}%)`;
 
         ctx.drawImage(
           imageElement,
@@ -350,19 +360,49 @@ function MainAppContent() {
         <h1>MONGSL <span className="subtitle">Crop & Compile</span></h1>
       </div>
       
+{/* ✨ 핵심 개선: 크롭 비율과 필터 컨트롤을 한 줄(가로 스크롤)로 통합 */}
       {selectedImage && (
-        <div className="aspect-ratio-bar">
-          <span className="aspect-label">크롭 비율:</span>
-          <div className="aspect-buttons">
-            {ASPECT_RATIOS.map((ratio, idx) => (
-              <button
-                key={idx}
-                className={`aspect-btn ${aspect === ratio.value ? 'active' : ''}`}
-                onClick={() => handleAspectChange(ratio.value)}
-              >
-                {ratio.label}
-              </button>
-            ))}
+        <div className="toolbar-container">
+          {/* 1. 크롭 비율 영역 */}
+          <div className="toolbar-section">
+            <span className="toolbar-label">비율:</span>
+            <div className="aspect-buttons">
+              {ASPECT_RATIOS.map((ratio, idx) => (
+                <button
+                  key={idx}
+                  className={`aspect-btn ${aspect === ratio.value ? 'active' : ''}`}
+                  onClick={() => handleAspectChange(ratio.value)}
+                >
+                  {ratio.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 시각적 구분선 ( | ) */}
+          <div className="toolbar-divider"></div>
+
+          {/* 2. 필터 보정 영역 */}
+          <div className="toolbar-section">
+            <div className="filter-group">
+              <span className="toolbar-label">밝기</span>
+              <input type="range" min="50" max="150" value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} />
+              <span className="filter-value">{brightness}%</span>
+            </div>
+            <div className="filter-group">
+              <span className="toolbar-label">대비</span>
+              <input type="range" min="50" max="150" value={contrast} onChange={(e) => setContrast(Number(e.target.value))} />
+              <span className="filter-value">{contrast}%</span>
+            </div>
+            <div className="filter-group checkbox">
+              <label>
+                <input type="checkbox" checked={grayscale === 100} onChange={(e) => setGrayscale(e.target.checked ? 100 : 0)} />
+                흑백
+              </label>
+            </div>
+            <button className="reset-filter-btn" onClick={() => { setBrightness(100); setContrast(100); setGrayscale(0); }}>
+              초기화
+            </button>
           </div>
         </div>
       )}
@@ -391,7 +431,14 @@ function MainAppContent() {
               aspect={aspect}
               ruleOfThirds
             >
-              <img ref={imgRef} src={selectedImage.previewUrl} alt="Selected for cropping" onLoad={onImageLoad} />
+              <img 
+                ref={imgRef} 
+                src={selectedImage.previewUrl} 
+                alt="Selected for cropping" 
+                onLoad={onImageLoad}
+                /* ✨ 추가: UI 실시간 미리보기를 위한 CSS 필터 적용 */
+                style={{ filter: `brightness(${brightness}%) contrast(${contrast}%) grayscale(${grayscale}%)` }}
+              />
             </ReactCrop>
           )}
         </div>

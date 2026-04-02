@@ -4,8 +4,8 @@ import JSZip from 'jszip';
 self.onmessage = async (e) => {
   try {
     // ✨ 변경점: quality 파라미터 추가 (기본값 0.95)
-    const { format, images, completedCrop, selectedImage, viewPort, quality = 0.95 } = e.data;
-
+    // ✨ 추가: filters 파라미터 받기
+    const { format, images, completedCrop, selectedImage, viewPort, quality = 0.95, filters } = e.data;
     // 크롭 스케일 및 오프셋 계산 (기존과 동일)
     const scaleX = selectedImage.originalWidth / viewPort.width;
     const scaleY = selectedImage.originalHeight / viewPort.height;
@@ -37,6 +37,11 @@ self.onmessage = async (e) => {
       const canvas = new OffscreenCanvas(coords.w, coords.h);
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Canvas 2D context is not supported');
+
+      // ✨ 추가: Canvas에 이미지 그리기 전 필터 적용
+      if (filters) {
+        ctx.filter = `brightness(${filters.brightness}%) contrast(${filters.contrast}%) grayscale(${filters.grayscale}%)`;
+      }
 
       ctx.drawImage(
           imageBitmap,
