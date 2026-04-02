@@ -584,7 +584,7 @@ function MainAppContent() {
           <div className="footer-links">
             <a href="#" onClick={(e) => { e.preventDefault(); setIsInfoOpen(true); }}>사용 안내</a>
             <a href="mailto:contact@example.com">Contact Us</a>
-            <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="https://github.com/unbeatable-bot/mongsl" target="_blank" rel="noreferrer">GitHub</a>
             <a href="#" onClick={(e) => { e.preventDefault(); setIsPrivacyOpen(true); }}>개인정보처리방침</a>
           </div>
         </div>
