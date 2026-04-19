@@ -22,6 +22,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Settings } from 'lucide-react';
 
 interface ImageFile {
   id: string;
@@ -131,6 +132,10 @@ function MainAppContent() {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
+  // ✨ 추가: 설정 메뉴 팝업 상태 및 Ref
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const settingsMenuRef = useRef<HTMLDivElement>(null);
+
   const [aspect, setAspect] = useState<number | undefined>(undefined);
   const [quality, setQuality] = useState<number>(0.95);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -167,7 +172,7 @@ function MainAppContent() {
       workerRef.current?.terminate();
     };
   }, []);
-
+  
   // ✨ 통합된 센서 설정 (PC와 모바일을 완벽하게 구분하면서 통합 제어)
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -442,11 +447,49 @@ function MainAppContent() {
 
   return (
     <div className="container">
-      <div className="header">
+      {/* ✨ 헤더 부분 수정: 설정 버튼 및 드롭다운 메뉴 추가 */}
+      <div className="header" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1>MONGSL <span className="subtitle">Crop & Compile</span></h1>
+        
+        {/* 설정 버튼 및 드롭다운 컨테이너 */}
+        <div className="settings-wrapper" ref={settingsMenuRef}>
+          <button 
+            className="settings-trigger"
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            aria-label="설정"
+          >
+            <Settings color="white" size={24} strokeWidth={2} />
+          </button>
+
+          {/* 버튼 아래에 뜨는 드롭다운 메뉴 */}
+          {isSettingsOpen && (
+            <div className="settings-dropdown" onClick={(e) => e.stopPropagation()}>
+              <div className="settings-dropdown-header">
+                <h2>설정</h2>
+                <button className="close-btn" onClick={() => setIsSettingsOpen(false)}>✕</button>
+              </div>
+              <div className="settings-dropdown-content">
+                <nav className="modal-menu-list">
+                  <button className="menu-item" onClick={() => { setIsSettingsOpen(false); setIsInfoOpen(true); }}>
+                    <span className="icon">❓</span> 사용 안내
+                  </button>
+                  <a href="mailto:your-email@example.com" className="menu-item" onClick={() => setIsSettingsOpen(false)}>
+                    <span className="icon">📧</span> Contact Us
+                  </a>
+                  <a href="https://github.com/unbeatable-bot/mongsl" target="_blank" rel="noreferrer" className="menu-item" onClick={() => setIsSettingsOpen(false)}>
+                    <span className="icon">🐙</span> GitHub
+                  </a>
+                  <button className="menu-item" onClick={() => { setIsSettingsOpen(false); setIsPrivacyOpen(true); }}>
+                    <span className="icon">🛡️</span> 개인정보처리방침
+                  </button>
+                </nav>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       
-{/* ✨ 핵심 개선: 크롭 비율과 필터 컨트롤을 한 줄(가로 스크롤)로 통합 */}
+      {/* ✨ 핵심 개선: 크롭 비율과 필터 컨트롤을 한 줄(가로 스크롤)로 통합 */}
       {selectedImage && (
         <div className="toolbar-container">
           {/* 1. 크롭 비율 영역 */}
@@ -494,7 +537,7 @@ function MainAppContent() {
       )}
 
       <div className="main-content">
-<div className="thumbnail-wrapper">
+        <div className="thumbnail-wrapper">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -575,24 +618,6 @@ function MainAppContent() {
         </div>
       </div>
 
-      <footer className="site-footer">
-        <div className="footer-content">
-          <div className="footer-brand">
-            <strong>MONGSL</strong>
-            <span>Image Crop & Compile Web Service</span>
-          </div>
-          <div className="footer-links">
-            <a href="#" onClick={(e) => { e.preventDefault(); setIsInfoOpen(true); }}>사용 안내</a>
-            <a href="mailto:contact@example.com">Contact Us</a>
-            <a href="https://github.com/unbeatable-bot/mongsl" target="_blank" rel="noreferrer">GitHub</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); setIsPrivacyOpen(true); }}>개인정보처리방침</a>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          &copy; {new Date().getFullYear()} MONGSL. All rights reserved.
-        </div>
-      </footer>
-
       {isProcessing && (
         <div className="processing-overlay">
           <div className="spinner"></div>
@@ -628,7 +653,7 @@ function MainAppContent() {
           </div>
         </div>
       )}
-      
+
       {isInfoOpen && <InfoPage onClose={() => setIsInfoOpen(false)} />}
       {isPrivacyOpen && <PrivacyPolicyModal onClose={() => setIsPrivacyOpen(false)} />}
     </div>

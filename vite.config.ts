@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import legacy from '@vitejs/plugin-legacy'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -11,8 +10,12 @@ export default defineConfig({
       // 'dead'는 더 이상 공식 지원되지 않는 브라우저를 의미합니다.
       // 이 설정을 통해 가장 광범위한 호환성을 확보할 수 있습니다.
       targets: ['defaults', 'not IE 11', 'dead']
-    })
+    }),
+    
   ],
+  server: {
+    port: 3000, // 원하시는 포트 번호로 변경
+  },
   worker: {
     // Vite에게 .ts 파일을 워커 스크립트로 처리하도록 명시적으로 알립니다.
     // 'module' 타입 워커에 대한 지원을 강화합니다.
