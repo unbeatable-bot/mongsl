@@ -80,7 +80,7 @@ const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ onClose }) => {
             </div>
             <div className="faq-item" style={{ border: 'none', background: 'transparent' }}>
               <p>
-                개인정보처리방침과 관련된 문의사항이 있으신 경우, 화면 하단의 'Contact Us' 메뉴를 통해 문의해 주시기 바랍니다.
+                개인정보처리방침과 관련된 문의사항이 있으신 경우, 설정의 'Contact Us' 메뉴를 통해 문의해 주시기 바랍니다.
               </p>
             </div>
           </section>

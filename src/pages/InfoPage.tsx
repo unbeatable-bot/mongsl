@@ -109,10 +109,6 @@ const InfoPage: React.FC<InfoPageProps> = ({ onClose }) => {
             </div>
           </section>
         </div>
-        
-        <footer className="modal-footer">
-          <p>사용 중 불편한 점은 푸터의 'Contact Us'로 문의해주세요.</p>
-        </footer>
       </div>
     </div>
   );

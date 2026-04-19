@@ -173,6 +173,25 @@ function MainAppContent() {
     };
   }, []);
   
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // ref가 가리키는 요소(settings-wrapper) 밖을 클릭했을 때만 닫음
+      if (settingsMenuRef.current && !settingsMenuRef.current.contains(event.target as Node)) {
+        setIsSettingsOpen(false);
+      }
+    };
+
+    // 메뉴가 열려있을 때만 이벤트 리스너 등록
+    if (isSettingsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    // 컴포넌트가 언마운트되거나 메뉴가 닫힐 때 리스너 제거 (메모리 누수 방지)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSettingsOpen]);
+
   // ✨ 통합된 센서 설정 (PC와 모바일을 완벽하게 구분하면서 통합 제어)
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -464,10 +483,6 @@ function MainAppContent() {
           {/* 버튼 아래에 뜨는 드롭다운 메뉴 */}
           {isSettingsOpen && (
             <div className="settings-dropdown" onClick={(e) => e.stopPropagation()}>
-              <div className="settings-dropdown-header">
-                <h2>설정</h2>
-                <button className="close-btn" onClick={() => setIsSettingsOpen(false)}>✕</button>
-              </div>
               <div className="settings-dropdown-content">
                 <nav className="modal-menu-list">
                   <button className="menu-item" onClick={() => { setIsSettingsOpen(false); setIsInfoOpen(true); }}>
