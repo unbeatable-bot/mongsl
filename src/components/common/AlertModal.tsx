@@ -35,6 +35,8 @@ const AlertModal: React.FC<Props> = ({ title = '알림', message, onClose }) => 
   );
 };
 
+export default AlertModal;
+
 // (참고) 향후 Alert / Confirm 모달 사용 방법
 // export default AlertModal;
 

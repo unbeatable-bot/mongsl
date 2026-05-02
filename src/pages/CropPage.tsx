@@ -83,7 +83,7 @@ const CropPage: React.FC = () => {
     setCrop(newCrop); setCompletedCrop(newCrop);
   };
 
-  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => handleResetCrop(aspect);
+  const onImageLoad = (_e: React.SyntheticEvent<HTMLImageElement>) => handleResetCrop(aspect);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
