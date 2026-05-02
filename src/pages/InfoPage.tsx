@@ -19,7 +19,7 @@ const InfoPage: React.FC<InfoPageProps> = ({ onClose }) => {
         
         <header className="bg-white text-[#333] p-[25px_30px] flex flex-col items-center shrink-0 border-b border-[#f0f0f0] max-md:p-[20px]">
           <div className="w-full flex justify-center items-center relative mb-[8px]">
-            <h1 className="m-0 text-[1.8em] font-extrabold text-[#00a896] tracking-[-0.5px] max-md:text-[1.5em]">MongSl 사용 안내</h1>
+            <h1 className="m-0 text-[1.8em] font-extrabold text-[#00a896] tracking-[-0.5px] max-md:text-[1.5em]">MongTool Crop & Compile 사용 안내</h1>
             <button className="absolute right-[-5px] bg-transparent border-none text-[#999] cursor-pointer p-[8px] flex items-center justify-center rounded-full transition-all duration-200 hover:bg-[#f5f5f5] hover:text-[#333]" onClick={onClose} title="닫기">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -57,7 +57,7 @@ const InfoPage: React.FC<InfoPageProps> = ({ onClose }) => {
           <section className="bg-transparent p-0 mb-[35px] shadow-none">
             <div className="flex items-center gap-[10px] mb-[20px] border-b-2 border-[#eaeaea] pb-[10px]">
               <span className="text-[1.3em]">✨</span>
-              <h2 className="text-[1.4em] font-bold text-[#222] m-0 text-left">MongSl의 특징</h2>
+              <h2 className="text-[1.4em] font-bold text-[#222] m-0 text-left">MongTool의 특징</h2>
             </div>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-[15px]">
               {[

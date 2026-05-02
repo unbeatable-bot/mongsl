@@ -27,7 +27,7 @@ const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ onClose }) => {
               </svg>
             </button>
           </div>
-          <p className="text-[1em] text-[#666] m-0 font-normal">MongSl 서비스 이용을 위한 프라이버시 정책</p>
+          <p className="text-[1em] text-[#666] m-0 font-normal">MongTool 서비스 이용을 위한 프라이버시 정책</p>
         </header>
 
         <div className="overflow-y-auto p-[30px] text-[#444] leading-[1.6] bg-[#fafafa] max-md:p-[20px] [&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-track]:bg-[#fafafa] [&::-webkit-scrollbar-thumb]:bg-[#ddd] [&::-webkit-scrollbar-thumb]:rounded-[4px] hover:[&::-webkit-scrollbar-thumb]:bg-[#ccc]">
@@ -39,7 +39,7 @@ const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ onClose }) => {
             </div>
             <div className="bg-transparent border-none overflow-hidden">
               <p className="m-0 text-[#666] text-[0.95em]">
-                <strong>MongSl은 사용자의 이미지를 서버로 전송하거나 저장하지 않습니다.</strong><br />
+                <strong>MongTool은 사용자의 이미지를 서버로 전송하거나 저장하지 않습니다.</strong><br />
                 모든 이미지 업로드, 크롭(자르기), 그리고 파일 변환(PDF/ZIP) 과정은 오직 사용자의 웹 브라우저 내부(로컬 환경)에서만 처리됩니다. 따라서 개인적인 사진이나 민감한 문서가 외부로 유출될 위험이 없으며, 당사는 사용자의 원본 및 변환된 이미지 데이터에 접근할 수 없습니다.
               </p>
             </div>

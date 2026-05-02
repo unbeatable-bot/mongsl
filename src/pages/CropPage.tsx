@@ -46,7 +46,7 @@ const CropPage: React.FC = () => {
       const { status, data, message, format } = e.data;
       if (status === 'success') {
         const mimeType = format === 'pdf' ? 'application/pdf' : 'application/zip';
-        saveAs(new Blob([data as BlobPart], { type: mimeType }), `mongsl-${format}-${Date.now()}.${format}`);
+        saveAs(new Blob([data as BlobPart], { type: mimeType }), `mongtool${format}-${Date.now()}.${format}`);
       } else alert(`파일 생성 실패: ${message}`);
       setIsProcessing(false); setProcessingType(null);
     };
