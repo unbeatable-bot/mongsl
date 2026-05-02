@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import legacy from '@vitejs/plugin-legacy'
+import tailwindcss from '@tailwindcss/vite' // 추가된 부분
 
 export default defineConfig({
   plugins: [
@@ -11,6 +12,7 @@ export default defineConfig({
       // 이 설정을 통해 가장 광범위한 호환성을 확보할 수 있습니다.
       targets: ['defaults', 'not IE 11', 'dead']
     }),
+    tailwindcss(),
     
   ],
   server: {

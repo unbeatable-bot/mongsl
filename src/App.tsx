@@ -52,7 +52,7 @@ function SortableThumbnail({ image, isActive, onClick }: SortableThumbnailProps)
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 10 : 1, // 드래그 중인 요소를 위로 띄움
+    zIndex: isDragging ? 10 : 1,
     opacity: isDragging ? 0.6 : 1,
   };
 
@@ -64,7 +64,12 @@ function SortableThumbnail({ image, isActive, onClick }: SortableThumbnailProps)
       {...listeners}
       src={image.previewUrl}
       alt="thumbnail"
-      className={`thumbnail-img ${isActive ? 'active' : ''} ${isDragging ? 'is-dragging' : ''}`}
+      // 기존 className="thumbnail-img ..." 를 아래처럼 변경
+      className={`w-full h-auto max-md:w-auto max-md:h-full shrink-0 cursor-pointer border-2 rounded-[4px] object-cover transition-colors duration-300 ${
+        isActive ? 'border-[#0d6efd]' : 'border-transparent'
+      } ${
+        isDragging ? 'opacity-40 scale-90 transition-all duration-200 ease-in-out' : ''
+      }`}
       onClick={onClick}
     />
   );
@@ -465,37 +470,42 @@ function MainAppContent() {
   };
 
   return (
-    <div className="container">
-      {/* ✨ 헤더 부분 수정: 설정 버튼 및 드롭다운 메뉴 추가 */}
-      <div className="header" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>MONGSL <span className="subtitle">Crop & Compile</span></h1>
+    <div className="w-full h-full mx-auto bg-[#1e1e1e] border border-[#333] p-[20px] rounded-[8px] shadow-[0_4px_15px_rgba(0,0,0,0.4)] flex flex-col box-border max-md:h-auto max-md:min-h-[100dvh] max-md:overflow-y-auto">
+{/* .header 역할 */}
+      <div className="relative flex justify-between items-center py-[15px] px-[20px] text-[#ecf0f1] shadow-[0_2px_4px_rgba(0,0,0,0.1)] border-b border-[#34495e] mb-[15px]">
+        {/* h1 및 .subtitle */}
+        <h1 className="m-0 text-[2.2em] max-md:text-[1.5em] font-bold flex items-baseline text-white text-center shrink-0">
+          MongTool <span className="text-[0.5em] font-normal ml-[10px] text-[#bdc3c7]">Crop & Compile</span>
+        </h1>
         
-        {/* 설정 버튼 및 드롭다운 컨테이너 */}
-        <div className="settings-wrapper" ref={settingsMenuRef}>
+        {/* .settings-wrapper 역할 */}
+        <div className="relative" ref={settingsMenuRef}>
+          {/* .settings-trigger 역할 */}
           <button 
-            className="settings-trigger"
+            className="bg-transparent border-none p-[8px] cursor-pointer outline-none flex items-center justify-center transition-opacity duration-200 hover:opacity-70"
             onClick={() => setIsSettingsOpen(!isSettingsOpen)}
             aria-label="설정"
           >
             <Settings color="white" size={24} strokeWidth={2} />
           </button>
 
-          {/* 버튼 아래에 뜨는 드롭다운 메뉴 */}
+          {/* .settings-dropdown 역할 */}
           {isSettingsOpen && (
-            <div className="settings-dropdown" onClick={(e) => e.stopPropagation()}>
-              <div className="settings-dropdown-content">
-                <nav className="modal-menu-list">
-                  <button className="menu-item" onClick={() => { setIsSettingsOpen(false); setIsInfoOpen(true); }}>
-                    <span className="icon">❓</span> 사용 안내
+            <div className="absolute top-[calc(100%+8px)] right-0 w-max min-w-[180px] bg-[#1e1e1e] border border-[#333] rounded-[12px] shadow-[0_10px_25px_rgba(0,0,0,0.5)] z-[1000] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="p-[8px]">
+                <nav className="flex flex-col gap-[4px]">
+                  {/* .menu-item 역할 */}
+                  <button className="flex items-center gap-[12px] py-[10px] px-[16px] text-[#ececec] text-[14px] border-none bg-transparent rounded-[8px] cursor-pointer text-left whitespace-nowrap transition-colors duration-200 hover:bg-[#333] w-full" onClick={() => { setIsSettingsOpen(false); setIsInfoOpen(true); }}>
+                    <span className="text-[16px]">❓</span> 사용 안내
                   </button>
-                  <a href="mailto:your-email@example.com" className="menu-item" onClick={() => setIsSettingsOpen(false)}>
-                    <span className="icon">📧</span> Contact Us
+                  <a href="mailto:your-email@example.com" className="flex items-center gap-[12px] py-[10px] px-[16px] text-[#ececec] text-[14px] no-underline border-none bg-transparent rounded-[8px] cursor-pointer text-left whitespace-nowrap transition-colors duration-200 hover:bg-[#333]" onClick={() => setIsSettingsOpen(false)}>
+                    <span className="text-[16px]">📧</span> Contact Us
                   </a>
-                  <a href="https://github.com/unbeatable-bot/mongsl" target="_blank" rel="noreferrer" className="menu-item" onClick={() => setIsSettingsOpen(false)}>
-                    <span className="icon">🐙</span> GitHub
+                  <a href="https://github.com/unbeatable-bot/mongsl" target="_blank" rel="noreferrer" className="flex items-center gap-[12px] py-[10px] px-[16px] text-[#ececec] text-[14px] no-underline border-none bg-transparent rounded-[8px] cursor-pointer text-left whitespace-nowrap transition-colors duration-200 hover:bg-[#333]" onClick={() => setIsSettingsOpen(false)}>
+                    <span className="text-[16px]">🐙</span> GitHub
                   </a>
-                  <button className="menu-item" onClick={() => { setIsSettingsOpen(false); setIsPrivacyOpen(true); }}>
-                    <span className="icon">🛡️</span> 개인정보처리방침
+                  <button className="flex items-center gap-[12px] py-[10px] px-[16px] text-[#ececec] text-[14px] border-none bg-transparent rounded-[8px] cursor-pointer text-left whitespace-nowrap transition-colors duration-200 hover:bg-[#333] w-full" onClick={() => { setIsSettingsOpen(false); setIsPrivacyOpen(true); }}>
+                    <span className="text-[16px]">🛡️</span> 개인정보처리방침
                   </button>
                 </nav>
               </div>
@@ -505,16 +515,25 @@ function MainAppContent() {
       </div>
       
       {/* ✨ 핵심 개선: 크롭 비율과 필터 컨트롤을 한 줄(가로 스크롤)로 통합 */}
+{/* ✨ 핵심 개선: 크롭 비율과 필터 컨트롤을 한 줄(가로 스크롤)로 통합 */}
       {selectedImage && (
-        <div className="toolbar-container">
+        // .toolbar-container 역할
+        <div className="flex items-center bg-[#2a2a2a] py-[10px] px-[15px] rounded-[8px] mb-[15px] border border-[#444] overflow-x-auto whitespace-nowrap gap-[15px] shrink-0 [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-[4px] hover:[&::-webkit-scrollbar-thumb]:bg-[#777]">
+          
           {/* 1. 크롭 비율 영역 */}
-          <div className="toolbar-section">
-            <span className="toolbar-label">비율:</span>
-            <div className="aspect-buttons">
+          {/* .toolbar-section 역할 */}
+          <div className="flex items-center gap-[10px]">
+            {/* .toolbar-label 역할 */}
+            <span className="text-[13px] font-bold text-[#bdc3c7]">비율:</span>
+            {/* .aspect-buttons 역할 */}
+            <div className="flex gap-[8px]">
               {ASPECT_RATIOS.map((ratio, idx) => (
                 <button
                   key={idx}
-                  className={`aspect-btn ${aspect === ratio.value ? 'active' : ''}`}
+                  // .aspect-btn 및 .aspect-btn.active 역할
+                  className={`bg-[#333] text-white border border-[#555] py-[6px] px-[12px] rounded-[20px] text-[13px] cursor-pointer transition-all duration-200 ease hover:bg-[#444] ${
+                    aspect === ratio.value ? '!bg-[#0d6efd] !border-[#0b5ed7] font-bold' : ''
+                  }`}
                   onClick={() => handleAspectChange(ratio.value)}
                 >
                   {ratio.label}
@@ -524,41 +543,64 @@ function MainAppContent() {
           </div>
 
           {/* 시각적 구분선 ( | ) */}
-          <div className="toolbar-divider"></div>
+          {/* .toolbar-divider 역할 */}
+          <div className="w-[2px] h-[20px] bg-[#555] shrink-0 rounded-[2px]"></div>
 
           {/* 2. 필터 보정 영역 */}
-          <div className="toolbar-section">
-            <div className="filter-group">
-              <span className="toolbar-label">밝기</span>
-              <input type="range" min="50" max="150" value={brightness} onChange={(e) => setBrightness(Number(e.target.value))} />
-              <span className="filter-value">{brightness}%</span>
+          {/* .toolbar-section 역할 */}
+          <div className="flex items-center gap-[10px]">
+            {/* .filter-group 역할 */}
+            <div className="flex items-center gap-[8px]">
+              <span className="text-[13px] font-bold text-[#bdc3c7]">밝기</span>
+              <input 
+                type="range" min="50" max="150" value={brightness} 
+                onChange={(e) => setBrightness(Number(e.target.value))} 
+                className="w-[80px] cursor-pointer accent-[#0d6efd] m-0"
+              />
+              <span className="text-[12px] text-[#999] min-w-[35px] text-right">{brightness}%</span>
             </div>
-            <div className="filter-group">
-              <span className="toolbar-label">대비</span>
-              <input type="range" min="50" max="150" value={contrast} onChange={(e) => setContrast(Number(e.target.value))} />
-              <span className="filter-value">{contrast}%</span>
+            <div className="flex items-center gap-[8px]">
+              <span className="text-[13px] font-bold text-[#bdc3c7]">대비</span>
+              <input 
+                type="range" min="50" max="150" value={contrast} 
+                onChange={(e) => setContrast(Number(e.target.value))} 
+                className="w-[80px] cursor-pointer accent-[#0d6efd] m-0"
+              />
+              <span className="text-[12px] text-[#999] min-w-[35px] text-right">{contrast}%</span>
             </div>
-            <div className="filter-group checkbox">
-              <label>
-                <input type="checkbox" checked={grayscale === 100} onChange={(e) => setGrayscale(e.target.checked ? 100 : 0)} />
+            <div className="flex items-center gap-[8px]">
+              <label className="flex items-center gap-[5px] cursor-pointer text-[13px] text-[#bdc3c7] font-bold">
+                <input 
+                  type="checkbox" 
+                  checked={grayscale === 100} 
+                  onChange={(e) => setGrayscale(e.target.checked ? 100 : 0)} 
+                  className="cursor-pointer w-[14px] h-[14px] m-0"
+                />
                 흑백
               </label>
             </div>
-            <button className="reset-filter-btn" onClick={() => { setBrightness(100); setContrast(100); setGrayscale(0); }}>
+            {/* .reset-filter-btn 역할 */}
+            <button 
+              className="bg-[#444] text-white border border-[#666] py-[5px] px-[12px] rounded-[4px] text-[12px] cursor-pointer transition-colors duration-200 hover:bg-[#555]" 
+              onClick={() => { setBrightness(100); setContrast(100); setGrayscale(0); }}
+            >
               초기화
             </button>
           </div>
         </div>
       )}
 
-      <div className="main-content">
-        <div className="thumbnail-wrapper">
+      {/* .main-content 역할: 전체를 좌/우로 나누는 뼈대 */}
+      <div className="flex-1 flex flex-row gap-[15px] overflow-visible min-h-0 relative max-md:flex-col max-md:gap-[10px] max-md:h-auto">
+        {/* .thumbnail-wrapper 역할 */}
+        <div className="w-[150px] h-full shrink-0 flex flex-col max-md:order-2 max-md:w-full max-md:h-auto max-md:static max-md:m-0">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <div className="thumbnail-list">
+            {/* .thumbnail-list 역할 */}
+            <div className="w-full h-full bg-[#2a2a2a] border border-[#444] rounded-[8px] p-[10px] overflow-y-auto flex flex-col gap-[10px] box-border max-md:flex-row max-md:h-[100px] max-md:overflow-x-auto max-md:overflow-y-hidden [&::-webkit-scrollbar]:w-[6px] max-md:[&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-[4px] hover:[&::-webkit-scrollbar-thumb]:bg-[#777]">
               <SortableContext
                 items={images.map(img => img.id)}
                 strategy={horizontalListSortingStrategy}
@@ -576,11 +618,12 @@ function MainAppContent() {
           </DndContext>
         </div>
 
-        <div className="cropper-container">
+        {/* .cropper-container 역할 */}
+        <div className="flex-1 flex justify-center items-center border border-[#444] rounded-[8px] overflow-hidden min-w-0 bg-[#1a1a1a] max-md:order-1 max-md:w-full max-md:min-h-[350px] max-md:ml-0 [&_.ReactCrop]:!max-w-full [&_.ReactCrop]:!max-h-full [&_.ReactCrop]:w-full [&_.ReactCrop]:h-full [&_.ReactCrop]:flex [&_.ReactCrop]:justify-center [&_.ReactCrop]:items-center [&_.ReactCrop>div]:!max-w-full [&_.ReactCrop>div]:!max-h-full [&_.ReactCrop>div]:w-full [&_.ReactCrop>div]:h-full [&_.ReactCrop>div]:flex [&_.ReactCrop>div]:justify-center [&_.ReactCrop>div]:items-center [&_img]:!max-w-full [&_img]:!max-h-full [&_img]:object-contain [&_.ReactCrop__crop-selection]:shadow-[0_0_0_9999em_rgba(0,0,0,0.5)]">
           {selectedImage && (
             <ReactCrop
               crop={crop}
-              onChange={handleCropChange} // ✨ onChange에 JS 강제 제한 로직 추가
+              onChange={handleCropChange}
               onComplete={c => setCompletedCrop(c)}
               aspect={aspect}
               ruleOfThirds
@@ -590,32 +633,38 @@ function MainAppContent() {
                 src={selectedImage.previewUrl} 
                 alt="Selected for cropping" 
                 onLoad={onImageLoad}
-                /* ✨ 추가: UI 실시간 미리보기를 위한 CSS 필터 적용 */
                 style={{ filter: `brightness(${brightness}%) contrast(${contrast}%) grayscale(${grayscale}%)` }}
               />
             </ReactCrop>
           )}
         </div>
         
-        <div className="actions-bar side">
-          <label htmlFor="file-upload" className="custom-file-upload">이미지 업로드 ({images.length}장)</label>
-          <input id="file-upload" type="file" multiple accept="image/*" onChange={onFileChange} />
+        {/* .actions-bar.side 역할 */}
+        <div className="flex flex-col items-stretch justify-start gap-[10px] ml-[15px] shrink-0 max-md:flex-row max-md:flex-wrap max-md:justify-between max-md:ml-0 max-md:w-full">
           
-          <button onClick={handleResetCrop} className="reset-crop-button" disabled={!selectedImage || isProcessing}>
+          {/* 버튼들은 공통 스타일을 가지며 bg/hover-bg 색상만 다릅니다 */}
+          <label htmlFor="file-upload" className="bg-[#0d6efd] hover:bg-[#0b5ed7] hover:-translate-y-[1px] disabled:bg-[#444] disabled:text-[#888] disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 py-[8px] px-[15px] text-[14px] cursor-pointer text-white border-none rounded-[5px] transition-all duration-300 whitespace-nowrap shadow-[0_2px_5px_rgba(0,0,0,0.3)] text-center max-md:px-[10px] max-md:text-[12px] max-md:flex-1">
+            이미지 업로드 ({images.length}장)
+          </label>
+          <input id="file-upload" type="file" multiple accept="image/*" onChange={onFileChange} className="hidden" />
+          
+          <button onClick={handleResetCrop} disabled={!selectedImage || isProcessing} className="bg-[#6c757d] hover:bg-[#5c636a] hover:-translate-y-[1px] disabled:bg-[#444] disabled:text-[#888] disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 py-[8px] px-[15px] text-[14px] cursor-pointer text-white border-none rounded-[5px] transition-all duration-300 whitespace-nowrap shadow-[0_2px_5px_rgba(0,0,0,0.3)] text-center max-md:px-[10px] max-md:text-[12px] max-md:flex-1">
             크롭 영역 초기화
           </button>
           
-          <button onClick={generatePreview} className="preview-button" disabled={images.length === 0 || !completedCrop || isProcessing}>
+          <button onClick={generatePreview} disabled={images.length === 0 || !completedCrop || isProcessing} className="bg-[#f39c12] hover:bg-[#e67e22] hover:-translate-y-[1px] disabled:bg-[#444] disabled:text-[#888] disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 py-[8px] px-[15px] text-[14px] cursor-pointer text-white border-none rounded-[5px] transition-all duration-300 whitespace-nowrap shadow-[0_2px_5px_rgba(0,0,0,0.3)] text-center max-md:px-[10px] max-md:text-[12px] max-md:flex-1">
             결과 미리보기 👀
           </button>
           
-          <div className="quality-selector-wrapper">
-            <label htmlFor="quality-select">압축 품질 (용량)</label>
+          {/* 품질 선택기 영역 */}
+          <div className="flex flex-col gap-[5px] bg-[#2a2a2a] p-[10px] rounded-[5px] border border-[#444] mt-[5px] max-md:w-full max-md:flex-[1_1_100%]">
+            <label htmlFor="quality-select" className="text-[12px] text-[#bdc3c7]">압축 품질 (용량)</label>
             <select 
               id="quality-select" 
               value={quality} 
               onChange={(e) => setQuality(Number(e.target.value))}
               disabled={isProcessing}
+              className="bg-[#1e1e1e] text-white border border-[#555] p-[6px] rounded-[4px] text-[13px] cursor-pointer"
             >
               <option value={0.95}>고화질 (권장)</option>
               <option value={0.7}>보통 (용량 절약)</option>
@@ -623,19 +672,25 @@ function MainAppContent() {
             </select>
           </div>
           
-          <button onClick={() => handleProcessImages('pdf')} className="pdf-download-button" disabled={images.length === 0 || !completedCrop || isProcessing}>
+          <button onClick={() => handleProcessImages('pdf')} disabled={images.length === 0 || !completedCrop || isProcessing} className="bg-[#198754] hover:bg-[#157347] hover:-translate-y-[1px] disabled:bg-[#444] disabled:text-[#888] disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 py-[8px] px-[15px] text-[14px] cursor-pointer text-white border-none rounded-[5px] transition-all duration-300 whitespace-nowrap shadow-[0_2px_5px_rgba(0,0,0,0.3)] text-center max-md:px-[10px] max-md:text-[12px] max-md:flex-1">
             {isProcessing && processingType === 'pdf' ? '생성 중...' : 'PDF 다운로드'}
           </button>
 
-          <button onClick={() => handleProcessImages('zip')} className="zip-download-button" disabled={images.length === 0 || !completedCrop || isProcessing}>
+          <button onClick={() => handleProcessImages('zip')} disabled={images.length === 0 || !completedCrop || isProcessing} className="bg-[#dc3545] hover:bg-[#bb2d3b] hover:-translate-y-[1px] disabled:bg-[#444] disabled:text-[#888] disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 py-[8px] px-[15px] text-[14px] cursor-pointer text-white border-none rounded-[5px] transition-all duration-300 whitespace-nowrap shadow-[0_2px_5px_rgba(0,0,0,0.3)] text-center max-md:px-[10px] max-md:text-[12px] max-md:flex-1">
             {isProcessing && processingType === 'zip' ? '생성 중...' : '이미지(ZIP) 다운로드'}
+          </button>
+
+          <button onClick={() => setIsInfoOpen(true) } disabled={!selectedImage || isProcessing} className="bg-[#6c757d] hover:bg-[#5c636a] hover:-translate-y-[1px] disabled:bg-[#444] disabled:text-[#888] disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-y-0 py-[8px] px-[15px] text-[14px] cursor-pointer text-white border-none rounded-[5px] transition-all duration-300 whitespace-nowrap shadow-[0_2px_5px_rgba(0,0,0,0.3)] text-center max-md:px-[10px] max-md:text-[12px] max-md:flex-1 flex justify-center items-center gap-[4px]">
+            <span className="text-[16px]">❓</span>사용 안내
           </button>
         </div>
       </div>
 
+      {/* 처리 중 오버레이 (.processing-overlay) */}
       {isProcessing && (
-        <div className="processing-overlay">
-          <div className="spinner"></div>
+        <div className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.7)] flex flex-col justify-center items-center text-white text-[1.2em] z-[1000] cursor-not-allowed">
+          {/* .spinner */}
+          <div className="border-[8px] border-[rgba(255,255,255,0.3)] border-t-white rounded-full w-[60px] h-[60px] animate-spin mb-[15px]"></div>
           <p>
             {processingType === 'pdf' ? 'PDF를' : 
              processingType === 'zip' ? 'ZIP 파일을' : '미리보기를'} 생성 중입니다... 잠시만 기다려 주세요.
@@ -643,25 +698,27 @@ function MainAppContent() {
         </div> 
       )}
       
+      {/* 업로드 중 오버레이 */}
       {isUploading && (
-        <div className="processing-overlay">
-          <div className="spinner"></div>
+        <div className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.7)] flex flex-col justify-center items-center text-white text-[1.2em] z-[1000] cursor-not-allowed">
+          <div className="border-[8px] border-[rgba(255,255,255,0.3)] border-t-white rounded-full w-[60px] h-[60px] animate-spin mb-[15px]"></div>
           <p>이미지 미리보기를 준비 중입니다...</p>
         </div>
       )}
 
+      {/* 결과 미리보기 모달 (.preview-modal-overlay) */}
       {isPreviewOpen && (
-        <div className="preview-modal-overlay">
-          <div className="preview-modal">
-            <div className="preview-modal-header">
-              <h2>PDF 페이지 미리보기 ({previewImages.length}장)</h2>
-              <button onClick={() => setIsPreviewOpen(false)}>닫기 ✕</button>
+        <div className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.85)] flex justify-center items-center z-[2000] backdrop-blur-[5px]">
+          <div className="bg-[#1e1e1e] w-[90%] max-w-[800px] h-[85vh] rounded-[12px] flex flex-col border border-[#444] shadow-[0_10px_30px_rgba(0,0,0,0.5)] overflow-hidden">
+            <div className="flex justify-between items-center py-[15px] px-[20px] bg-[#2a2a2a] border-b border-[#444]">
+              <h2 className="m-0 text-[1.2rem] text-white">PDF 페이지 미리보기 ({previewImages.length}장)</h2>
+              <button onClick={() => setIsPreviewOpen(false)} className="bg-transparent border-none text-[#bbb] text-[1.2rem] cursor-pointer transition-colors duration-200 hover:text-white">닫기 ✕</button>
             </div>
-            <div className="preview-modal-content">
+            <div className="flex-1 p-[20px] overflow-y-auto grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-[20px] content-start max-md:grid-cols-[repeat(auto-fill,minmax(140px,1fr))]">
               {previewImages.map((src, idx) => (
-                <div key={idx} className="preview-page">
-                  <span className="page-number">{idx + 1}</span>
-                  <img src={src} alt={`preview-${idx}`} />
+                <div key={idx} className="relative bg-white rounded-[4px] p-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.2)] flex justify-center items-center">
+                  <span className="absolute top-[5px] left-[5px] bg-[rgba(0,0,0,0.6)] text-white text-[12px] py-[2px] px-[6px] rounded-[10px]">{idx + 1}</span>
+                  <img src={src} alt={`preview-${idx}`} className="max-w-full max-h-[250px] object-contain" />
                 </div>
               ))}
             </div>
