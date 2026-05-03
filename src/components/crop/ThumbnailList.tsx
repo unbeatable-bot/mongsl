@@ -36,7 +36,8 @@ const ThumbnailList: React.FC<Props> = ({ images, setImages, selectedId, onSelec
   return (
     <div className="w-[150px] h-full shrink-0 flex flex-col max-md:order-2 max-md:w-full max-md:h-auto max-md:static max-md:m-0">
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div className="w-full h-full bg-[#2a2a2a] border border-[#444] rounded-[8px] p-[10px] overflow-y-auto flex flex-col gap-[10px] box-border max-md:flex-row max-md:h-[100px] max-md:overflow-x-auto max-md:overflow-y-hidden [&::-webkit-scrollbar]:w-[6px] max-md:[&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#555] hover:[&::-webkit-scrollbar-thumb]:bg-[#777] [&::-webkit-scrollbar-thumb]:rounded-[4px]">
+        {/* ✨ 배경과 테두리, 스크롤바 색상을 테마 변수로 교체 */}
+        <div className="w-full h-full bg-sub-bg border border-border-color rounded-[8px] p-[10px] overflow-y-auto flex flex-col gap-[10px] box-border transition-colors duration-300 max-md:flex-row max-md:h-[100px] max-md:overflow-x-auto max-md:overflow-y-hidden [&::-webkit-scrollbar]:w-[6px] max-md:[&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border-color hover:[&::-webkit-scrollbar-thumb]:bg-main-text/30 [&::-webkit-scrollbar-thumb]:rounded-[4px]">
           <SortableContext items={images.map(img => img.id)} strategy={horizontalListSortingStrategy}>
             {images.map(img => <SortableThumbnail key={img.id} image={img} isActive={selectedId === img.id} onClick={() => onSelect(img)} />)}
           </SortableContext>

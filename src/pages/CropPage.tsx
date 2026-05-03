@@ -142,14 +142,14 @@ const CropPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full mx-auto bg-[#1e1e1e] border border-[#333] p-[20px] rounded-[8px] shadow-[0_4px_15px_rgba(0,0,0,0.4)] flex flex-col box-border max-md:h-auto max-md:min-h-[100dvh] max-md:overflow-y-auto">
+    // ✨ 배경과 테두리를 테마 변수로 교체
+    <div className="w-full h-full mx-auto bg-main-bg border border-border-color p-[20px] rounded-[8px] shadow-[0_4px_15px_rgba(0,0,0,0.1)] flex flex-col box-border max-md:h-auto max-md:min-h-[100dvh] max-md:overflow-y-auto transition-colors duration-300">
       <Header />
       {selectedImage && (
         <CropToolbar aspect={aspect} onAspectChange={(v) => { setAspect(v); handleResetCrop(v); }} brightness={brightness} setBrightness={setBrightness} contrast={contrast} setContrast={setContrast} grayscale={grayscale} setGrayscale={setGrayscale} />
       )}
       <div className="flex-1 flex flex-row gap-[15px] overflow-visible min-h-0 relative max-md:flex-col max-md:gap-[10px] max-md:h-auto">
         <ThumbnailList images={images} setImages={setImages} selectedId={selectedImage?.id} onSelect={setSelectedImage} />
-        {/* ✨ 조건문 제거, imageUrl에 옵셔널 체이닝(?.) 적용 */}
         <ImageCropper 
           imageUrl={selectedImage?.previewUrl} 
           crop={crop} 

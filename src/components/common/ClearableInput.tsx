@@ -18,25 +18,28 @@ const ClearableInput: React.FC<Props> = ({
   fontSizeClass = 'text-[24px]'
 }) => {
   return (
-    <div className={`flex items-end border-b-2 border-[#555] transition-colors pb-[5px] ${focusColorClass}`}>
+    // ✨ 밑줄 색상 변경: border-[#555] -> border-border-color
+    <div className={`flex items-end border-b-2 border-border-color transition-colors pb-[5px] ${focusColorClass}`}>
+      {/* ✨ 입력 텍스트 색상 변경: text-white -> text-main-text */}
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full bg-transparent text-white font-bold outline-none ${fontSizeClass}`}
+        className={`w-full bg-transparent text-main-text font-bold outline-none ${fontSizeClass}`}
         placeholder={placeholder}
       />
       {/* 값이 있을 때만 X 버튼 표시 */}
       {value && (
         <button
           onClick={() => onChange('')}
-          className="mb-[4px] mr-[8px] flex items-center justify-center w-[20px] h-[20px] rounded-full bg-[#555] hover:bg-[#888] text-white text-[12px] transition-colors shrink-0"
+          className="mb-[4px] mr-[8px] flex items-center justify-center w-[20px] h-[20px] rounded-full bg-border-color hover:bg-main-text/30 text-main-text text-[12px] transition-colors shrink-0"
           title="지우기"
         >
           ✕
         </button>
       )}
-      {suffix && <span className="text-[#888] text-[16px] mb-[4px] shrink-0">{suffix}</span>}
+      {/* ✨ 우측 접미사(%, 원 등) 색상 변경 */}
+      {suffix && <span className="text-main-text/60 text-[16px] mb-[4px] shrink-0">{suffix}</span>}
     </div>
   );
 };

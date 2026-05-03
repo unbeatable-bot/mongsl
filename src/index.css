@@ -1,4 +1,30 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* 1. 테마 변수 등록 (Tailwind v4 방식) */
+@theme {
+  --color-main-bg: var(--main-bg);
+  --color-main-text: var(--main-text);
+  --color-sub-bg: var(--sub-bg);
+  --color-border-color: var(--border-color);
+}
+
+/* 2. 모드별 색상 값 정의 */
+:root {
+  /* 라이트 모드 색상 */
+  --main-bg: #ffffff;
+  --main-text: #1a1a1a;
+  --sub-bg: #f3f4f6;
+  --border-color: #e5e7eb;
+}
+
+.dark {
+  /* 다크 모드 색상 (기본값 유지) */
+  --main-bg: #121212;
+  --main-text: #e0e0e0;
+  --sub-bg: #2a2a2a;
+  --border-color: #444444;
+}
 
 @layer base {
   /* ⚠️ 절대 수정 금지 영역: 좌표 계산 로직을 위한 레이아웃 고정 */
@@ -7,7 +33,8 @@
   }
   
   body {
-    @apply bg-[#121212] text-[#e0e0e0] flex flex-col overflow-y-auto;
+    /* bg-[#121212] -> bg-main-bg / text-[#e0e0e0] -> text-main-text 로 변경 */
+    @apply bg-main-bg text-main-text flex flex-col overflow-y-auto transition-colors duration-200;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   }
   
